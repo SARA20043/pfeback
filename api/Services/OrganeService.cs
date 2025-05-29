@@ -99,7 +99,8 @@ public async Task<IEnumerable<OrganeDTO>> GetAllAsync(
         public async Task<OrganeDTO> CreateAsync(CreateOrganeDTO dto)
         {
             // 🔵 Générer automatiquement le code organe
-            string newCode = await GenerateNewCodeAsync();
+            string newCode = await GenerateNewCodeAsync(dto.libelle_organe);
+
 
             var organe = new Organe
             {
@@ -193,26 +194,33 @@ public async Task<IEnumerable<OrganeDTO>> GetAllAsync(
             await _context.SaveChangesAsync();
             return true;
         }
-        private async Task<string> GenerateNewCodeAsync()
+        private async Task<string> GenerateNewCodeAsync(string libelle_organe)
 {
+    // Prendre les 3 premières lettres de la désignation, en majuscules
+    string prefix = libelle_organe.Length >= 3 
+        ? libelle_organe.Substring(0, 3).ToUpper() 
+        : libelle_organe.ToUpper().PadRight(3, 'X'); // Complète si < 3 caractères
+
+    // Récupérer les organes dont le code commence par ce préfixe
     var lastOrgane = await _context.Organes
-        .OrderByDescending(o => o.id_organe)
+        .Where(o => o.code_organe.StartsWith(prefix))
+        .OrderByDescending(o => o.code_organe)
         .FirstOrDefaultAsync();
 
     int nextNumber = 1;
 
-    if (lastOrgane != null && !string.IsNullOrEmpty(lastOrgane.code_organe))
+    if (lastOrgane != null && lastOrgane.code_organe.Length >= 5)
     {
-        // Supposons que le code est du style "ORG001", "ORG002" etc.
-        string numberPart = new string(lastOrgane.code_organe.SkipWhile(c => !char.IsDigit(c)).ToArray());
+        string numberPart = lastOrgane.code_organe.Substring(3); // Prend les 2 derniers caractères
         if (int.TryParse(numberPart, out int lastNumber))
         {
             nextNumber = lastNumber + 1;
         }
     }
 
-    return $"ORG{nextNumber:D3}"; // Format : ORG001, ORG002, ORG003, etc.
+    return $"{prefix}{nextNumber:D2}"; // Format : XXX01, XXX02, etc.
 }
+
 
         public async Task<IEnumerable<OrganeCaracteristiqueDTO>> GetByOrganeIdAsync(int id_organe)
         {
