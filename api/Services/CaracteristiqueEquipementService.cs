@@ -201,6 +201,36 @@ namespace PFE_PROJECT.Services
                 nomcarac = caracteristiqueEquipement.Caracteristique?.libelle ?? string.Empty
             };
         }
+
+        public async Task<IEnumerable<CaracteristiqueEquipementDTO>?> ModifyBulkCaracteristiquesAsync(BulkModifyCaracteristiqueEquipementDTO dto)
+        {
+            var caracteristiqueEquipements = await _context.CaracteristiqueEquipements
+                .Include(ce => ce.Caracteristique)
+                .Where(ce => ce.ideqpt == dto.ideqpt && dto.caracteristiques.Select(c => c.idcarac).Contains(ce.idcarac))
+                .ToListAsync();
+
+            if (!caracteristiqueEquipements.Any())
+                return null;
+
+            foreach (var ce in caracteristiqueEquipements)
+            {
+                var updateData = dto.caracteristiques.FirstOrDefault(c => c.idcarac == ce.idcarac);
+                if (updateData != null)
+                {
+                    ce.valeur = updateData.valeur;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return caracteristiqueEquipements.Select(ce => new CaracteristiqueEquipementDTO
+            {
+                ideqpt = ce.ideqpt,
+                idcarac = ce.idcarac,
+                valeur = ce.valeur,
+                nomcarac = ce.Caracteristique?.libelle ?? string.Empty
+            });
+        }
     }
 } 
 

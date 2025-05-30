@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using PFE_PROJECT.Models;
 
 namespace PFE_PROJECT.Services
@@ -13,5 +15,6 @@ namespace PFE_PROJECT.Services
         Task<OrganeEquipementDTO?> AddOrganeAsync(AddOrganeEquipementDTO dto);
         Task<bool> DeleteOrganeAsync(DeleteOrganeEquipementDTO dto);
         Task<OrganeEquipementDTO?> ModifyOrganeAsync(ModifyOrganeEquipementDTO dto);
+        Task<IEnumerable<OrganeEquipementDTO>?> ModifyBulkOrganesAsync(BulkModifyOrganeEquipementDTO dto);
     }
 } 

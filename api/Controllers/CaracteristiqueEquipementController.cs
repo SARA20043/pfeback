@@ -78,5 +78,14 @@ namespace PFE_PROJECT.Controllers
                 return NotFound();
             return Ok(result);
         }
+
+        [HttpPut("modify-bulk")]
+        public async Task<ActionResult<IEnumerable<CaracteristiqueEquipementDTO>>> ModifyBulkCaracteristiques(BulkModifyCaracteristiqueEquipementDTO dto)
+        {
+            var results = await _service.ModifyBulkCaracteristiquesAsync(dto);
+            if (results == null || !results.Any())
+                return NotFound();
+            return Ok(results);
+        }
     }
 } 

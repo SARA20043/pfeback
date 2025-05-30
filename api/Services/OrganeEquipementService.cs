@@ -166,5 +166,35 @@ namespace PFE_PROJECT.Services
                 nomOrgane = organeEquipement.Organe?.libelle_organe ?? string.Empty
             };
         }
+
+        public async Task<IEnumerable<OrganeEquipementDTO>?> ModifyBulkOrganesAsync(BulkModifyOrganeEquipementDTO dto)
+        {
+            var organeEquipements = await _context.OrganeEquipements
+                .Include(oe => oe.Organe)
+                .Where(oe => oe.ideqpt == dto.ideqpt && dto.organes.Select(o => o.idorg).Contains(oe.idorg))
+                .ToListAsync();
+
+            if (!organeEquipements.Any())
+                return null;
+
+            foreach (var oe in organeEquipements)
+            {
+                var updateData = dto.organes.FirstOrDefault(o => o.idorg == oe.idorg);
+                if (updateData != null)
+                {
+                    oe.numsérie = updateData.numsérie;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return organeEquipements.Select(oe => new OrganeEquipementDTO
+            {
+                idorg = oe.idorg,
+                ideqpt = oe.ideqpt,
+                numsérie = oe.numsérie,
+                nomOrgane = oe.Organe?.libelle_organe ?? string.Empty
+            });
+        }
     }
 } 

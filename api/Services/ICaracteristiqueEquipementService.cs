@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using PFE_PROJECT.Data;
 using PFE_PROJECT.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace PFE_PROJECT.Services
 {
@@ -16,5 +18,6 @@ namespace PFE_PROJECT.Services
         Task<CaracteristiqueEquipementDTO?> AddCaracteristiqueAsync(AddCaracteristiqueEquipementDTO dto);
         Task<bool> DeleteCaracteristiqueAsync(DeleteCaracteristiqueEquipementDTO dto);
         Task<CaracteristiqueEquipementDTO?> ModifyCaracteristiqueAsync(ModifyCaracteristiqueEquipementDTO dto);
+        Task<IEnumerable<CaracteristiqueEquipementDTO>?> ModifyBulkCaracteristiquesAsync(BulkModifyCaracteristiqueEquipementDTO dto);
     }
 } 
